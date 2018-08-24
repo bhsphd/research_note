@@ -103,9 +103,33 @@ $$
 
 __本征矩阵的性质:__
 
-非零矩阵$E\in\mathbb{R}^{3\times3}$，是本征矩阵 $\Leftrightarrow$ $E$的奇异值分解$SVD(E)=U\Sigma V^T$结果是:
+非零矩阵$E\in\mathbb{R}^{3\times3}$，是本征矩阵当且仅当$E$的奇异值分解$SVD(E)=U\Sigma V^T$是:
 $$
 \Sigma = diag\{\sigma,\sigma,0\} , \sigma \in \mathbb{R}_+ ,U,V\in SO(3)
 $$
 证明过程如下：
 
+根据定义，对于任意一个本征矩阵$E$，都存在一对$R\in SO(3),t \in \mathbb{R}^3$，满足$\widehat{T}R=E$。对于$T$，存在一个旋转矩阵$R_0$满足$R_0T=[0,0,\lVert T\rVert]^T$。定义$a=R_0T \in \mathbb{R}^3$，因为$det(R_0)=1$，从上方的引理中可以得出：$\widehat{T}=R_0^T\widehat{a}R_0$，可以获得：
+$$
+EE^T =  \widehat{T}RR^T\widehat{T}^T=\widehat{T}\widehat{T}^T=R_0^T\widehat{a}\widehat{a}^TR_0
+$$
+可以得到：
+$$
+\widehat{a}\widehat{a}^T = 
+\begin{bmatrix}
+0  & -\Vert T \Vert &0 \\
+\Vert T \Vert &0 &0 \\
+0 &0 &0  \\
+\end{bmatrix}
+\begin{bmatrix}
+0  &\Vert T \Vert &0 \\
+-\Vert T \Vert & 0 &0 \\
+0 & 0 & 0 \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+\Vert T \Vert^2 &0 &0 \\
+0 &\Vert T \Vert^2  &0\\
+0 &0 & 0\\
+\end{bmatrix}
+$$
