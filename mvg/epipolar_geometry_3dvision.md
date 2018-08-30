@@ -113,7 +113,7 @@ $$
 $$
 EE^T =  \widehat{T}RR^T\widehat{T}^T=\widehat{T}\widehat{T}^T=R_0^T\widehat{a}\widehat{a}^TR_0
 $$
-可以得到：
+显然：
 $$
 \widehat{a}\widehat{a}^T = 
 \begin{bmatrix}
@@ -133,3 +133,4 @@ $$
 0 &0 & 0\\
 \end{bmatrix}
 $$
+所以$E$的奇异值为$(\lVert T\rVert,\lVert T\rVert,0)$，标准的$SVD$分解中，$U,V$只需要正交，所以还需要证明$U,V\in SO(3)$。

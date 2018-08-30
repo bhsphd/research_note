@@ -54,21 +54,23 @@ $$
 ### FocalPlaneXResolution:
 Indicate the number of pixels in the image width(X) direction per FocalPlaneResolutionUnit one the camer focal plane.
 
-###FlocalPlaneYResolution:
+### FlocalPlaneYResolution:
+
 Indicate the number of pixels in the image height(Y) direction per FocalPlaneResolutionUnit one the camer focal plane.
 
-###ocalPlaneResolutionUnit:
+### FocalPlaneResolutionUnit:
+
 Indicate the unit for measuring FocalPlaneXResolution and FlocalPlaneYResolution.This value is the same as the ResolutionUnit
 
+### focal_length_35mm到实际像素焦距的变换
 
-###focal_length_35mm到实际像素焦距的变换
 $35mm$焦距为$focal\_length35(mm)$，实际像素焦距为$focal\_length(pix)$,换算关系如下:
-
 $$
 focal\_length=\frac{focal\_length35}{35.0}*max\{image\_width,image\_height\}
 $$
 
-###实际物理焦距到像素焦距的变换
+### 实际物理焦距到像素焦距的变换
+
 $$
 focal\_length = \frac{focal\_length(mm)}{sensor\_width(mm)}*max\{image\_width,image\_height\}
 $$
