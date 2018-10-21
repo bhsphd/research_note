@@ -1,0 +1,22 @@
+An Iterative Image Registration Technique with an Application to Stereo Vision.是81年发表的。
+这里讲的是一种图像点定位的方法，即图像的局部匹配，将图像匹配问题，从传统的滑动窗口搜索方法变为一个求解偏移量d的过程
+Generalized Image Matching by the Method of Differences,"1984 OpenCV
+
+
+Good Features To Track
+这篇文章，主要就是讲，在求解d的过程中，哪些情况下可以保证一定能够得到d的解，这些情况的点有什么特点（后来会发现，很多时候都是寻找的角点）。
+
+
+KTL提升： TLD作者 Zdenek Kalal
+Forward-Backward Error: Automatic Detection of Tracking Failures
+
+[1] Bruce D. Lucas and Takeo Kanade. An Iterative Image Registration Technique with an Application to Stereo Vision. International Joint Conference on Artificial Intelligence, pages 674-679, 1981.
+[2] Carlo Tomasi and Takeo Kanade. Detection and Tracking of Point Features. Carnegie Mellon University Technical Report CMU-CS-91-132, April 1991.
+[3] Jianbo Shi and Carlo Tomasi. Good Features to Track. IEEE Conference on Computer Vision and Pattern Recognition, pages 593-600, 1994.
+[4] Stan Birchfield. Derivation of Kanade-Lucas-Tomasi Tracking Equation. Unpublished, January 1997.
+
+
+基于灰度的模板匹配算法（一）：MAD、SAD、SSD、MSD、NCC、SSDA、SATD算法
+
+
+
