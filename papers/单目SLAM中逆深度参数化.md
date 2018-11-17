@@ -83,7 +83,7 @@ $$
 $$
 图示：
 
-![](./fig1.png)
+![](../resources/fig1.png)
 
 
 
