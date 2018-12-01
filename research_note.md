@@ -12,4 +12,5 @@
 
 
 #### Awesome SLAM
++ [相关学习资料整理汇总](./awesome_slam/slam_vio_资料整理.md)
 + [MSCKF](./awesome_slam/msckf.md)
