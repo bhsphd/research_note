@@ -10,3 +10,6 @@
 
 #### 论文阅读笔记
 
+
+#### Awesome SLAM
++ [MSCKF](./awesome_slam/msckf.md)
