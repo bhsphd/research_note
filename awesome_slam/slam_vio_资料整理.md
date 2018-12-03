@@ -98,6 +98,7 @@
 + [徐尚](https://www.cnblogs.com/shang-slam/)：`VINS` `ORBSLAM`
 + [hitcm](http://www.cnblogs.com/hitcm/) ：`VIO` `LSD`
 + [游振兴](https://www.cnblogs.com/luyb/tag/SLAM/)：`VIO` `SVO`
++ [钟心亮](http://www.xinliang-zhong.com/)：`MSCKF` `VIO`
 
 ##### 发展规划相关
 

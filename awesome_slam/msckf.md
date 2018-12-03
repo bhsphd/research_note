@@ -20,6 +20,7 @@
 + [泡泡机器人msckf(一)](http://www.sohu.com/a/271224863_715754)
 + [泡泡机器人msckf(二)](http://www.sohu.com/a/271370131_715754)
 + [知乎VIO](https://www.zhihu.com/question/53571648/answer/137726592)
++ [钟心亮的推导和笔记](http://www.xinliang-zhong.com/msckf_notes/)
 
 #### 四、参考论文与书籍
 
