@@ -71,6 +71,9 @@
 
 #### 三、技术博客
 
+##### IMU建模与分析
++ [游振兴](https://www.cnblogs.com/youzx/p/6291327.html?utm_source=itdadao&utm_medium=referral)
+
 ##### 预积分
 
 + [高翔Momenta](https://zhuanlan.zhihu.com/p/36323177)
