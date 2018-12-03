@@ -73,7 +73,10 @@
 
 ##### IMU建模与分析
 + [游振兴](https://www.cnblogs.com/youzx/p/6291327.html?utm_source=itdadao&utm_medium=referral)
-
++ [Kalibr_wiki](https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model)
++ [GuassWhiteNoise](https://blog.csdn.net/ZSZ_shsf/article/details/46914853)
++ [泡泡机器人IMU状态模型(一)](http://mp.weixin.qq.com/s/PD4cOqVE3oMhyW4A2N02xQ)
++ [泡泡机器人IMU状态模型(二)](http://mp.weixin.qq.com/s/_ElpcSkMaGEIFd3bmwGa_Q)
 ##### 预积分
 
 + [高翔Momenta](https://zhuanlan.zhihu.com/p/36323177)
