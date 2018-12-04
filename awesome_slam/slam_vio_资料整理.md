@@ -71,6 +71,9 @@
 
 #### 三、技术博客
 
+##### 相关算法资源网站
++ [EuclideanSpace](http://www.euclideanspace.com/)
+
 ##### IMU建模与分析
 + [游振兴](https://www.cnblogs.com/youzx/p/6291327.html?utm_source=itdadao&utm_medium=referral)
 + [Kalibr_wiki](https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model)
