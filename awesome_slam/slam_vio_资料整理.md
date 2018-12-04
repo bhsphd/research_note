@@ -80,6 +80,7 @@
 + [GuassWhiteNoise](https://blog.csdn.net/ZSZ_shsf/article/details/46914853)
 + [泡泡机器人IMU状态模型(一)](http://mp.weixin.qq.com/s/PD4cOqVE3oMhyW4A2N02xQ)
 + [泡泡机器人IMU状态模型(二)](http://mp.weixin.qq.com/s/_ElpcSkMaGEIFd3bmwGa_Q)
++ [相机IMU融合](http://www.likecs.com/show-25370.html)
 ##### 预积分
 
 + [高翔Momenta](https://zhuanlan.zhihu.com/p/36323177)
@@ -102,6 +103,7 @@
 + [hitcm](http://www.cnblogs.com/hitcm/) ：`VIO` `LSD`
 + [游振兴](https://www.cnblogs.com/luyb/tag/SLAM/)：`VIO` `SVO`
 + [钟心亮](http://www.xinliang-zhong.com/)：`MSCKF` `VIO`
++ [极品巧克力](https://www.cnblogs.com/ilekoaiq)：`SVO` `VIO` `DepthFilter`
 
 ##### 发展规划相关
 
