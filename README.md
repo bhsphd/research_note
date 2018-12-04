@@ -2,7 +2,7 @@
 
 #### 基础数学知识
 
-+ [非线性优化算法](./非线性优化求解.md)
++ [非线性优化算法](./math/非线性优化求解.md)
 + [ceres学习笔记](./math/ceres学习笔记.md)
 + [MedianAbsoluteDeviation](./math/MedianAbsoluteDeviation.md)
 + [三维空间刚体运动](./math/三维空间刚体运动笔记整理.md)
