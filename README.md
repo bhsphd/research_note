@@ -29,3 +29,9 @@
 #### Awesome SLAM
 + [相关学习资料整理汇总](./awesome_slam/slam_vio_资料整理.md)
 + [MSCKF](./awesome_slam/msckf.md)
+
+
+#### 一些有用的参考网站
++ [各种变换以及数学知识](http://www.euclideanspace.com/) `四元数变换` `旋转矩阵`
++ [Python环境图解](https://xkcd.com/) 
++ [Minimal Problems](http://cmp.felk.cvut.cz/mini/) `PnP` `三角化` `P3P`
