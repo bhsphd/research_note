@@ -104,6 +104,7 @@
 + [游振兴](https://www.cnblogs.com/luyb/tag/SLAM/)：`VIO` `SVO`
 + [钟心亮](http://www.xinliang-zhong.com/)：`MSCKF` `VIO`
 + [极品巧克力](https://www.cnblogs.com/ilekoaiq)：`SVO` `VIO` `DepthFilter`
++ [刘枭](http://www.liuxiao.org/)：`slam` `DeepLearning` `AR`
 
 ##### 发展规划相关
 
