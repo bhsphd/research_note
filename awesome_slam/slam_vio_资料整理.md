@@ -133,7 +133,7 @@
 + [ROVIO](https://github.com/ethz-asl/rovio)：`单目` `IMU` `EKF`
 + [OKVIS](https://github.com/ethz-asl/okvis_ros)：`单目` `IMU` `非线性优化`
 + [ORBSLAM+IMU](https://github.com/JzHuai0108/ORB_SLAM)：`立体相机`
-+ 
++ [R-VIO](https://github.com/rpng/R-VIO):`Guoquan Huang` `IJRR`
 
 #### 六、实验室主页
 
