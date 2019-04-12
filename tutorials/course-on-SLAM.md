@@ -71,3 +71,132 @@ $$
 
 其中$q^{*}$为单位四元数$q$的共轭。
 
+### 机器人运动建模
+
+机器人的状态为一个关于：上一时刻状态、控制输入、噪声的函数：
+$$
+\mathbf{x}_{n}=f_{n}\left(\mathbf{x}_{n-1}, \mathbf{u}_{n}, \mathbf{i}\right), \quad \mathbf{i} \sim \mathcal{N}\{0, \mathbf{Q}\}
+$$
+也可以记做：
+$$
+\mathbf{x} \leftarrow f(\mathbf{x}, \mathbf{u}, \mathbf{i}), \quad \mathbf{i} \sim \mathcal{N}\{0, \mathbf{Q}\}
+$$
+
+#### 不确定性的传播
+
+假定机器人状态分布为高斯分布：$\mathbf{x} \sim \mathcal{N}\{\overline{\mathbf{x}}, \mathbf{P}\}$
+
+则对应的更新方程为：
+$$
+\begin{aligned} \overline{\mathbf{x}} \leftarrow & f(\overline{\mathbf{x}}, \mathbf{u}, 0) \\ \mathbf{P}  \leftarrow& \mathbf{F}_{x} \mathbf{P} \mathbf{F}_{x}^{\top}+\mathbf{F}_{i} \mathbf{Q} \mathbf{F}_{i}^{\top} \end{aligned}
+$$
+
+
+其中$\overline{\mathbf{x}}$为$\mathbf{x}$的均值，$\mathbf{P}$为其协方差矩阵，$\mathbf{i}$为扰动。
+$$
+\mathbf{F}_{x}=\left.\frac{\partial f}{\partial \mathbf{x}}\right|_{\overline{\mathbf{x}}, \mathbf{u}, \mathbf{i}=0}, \quad \mathbf{F}_{i}=\left.\frac{\partial f}{\partial \mathbf{i}}\right|_{\overline{\mathbf{x}}, \mathbf{u}, \mathbf{i}=0}
+$$
+
+
+### 常见的运动模型
+
+#### 匀速运动模型
+
+> 适用于控制输入无法获得的时候，例如手持相机运动
+
+外部的各种因素最终造成的扰动会直接表现在速度上$\mathbf{v}_{i} ,\boldsymbol{\omega}_{i}$
+$$
+\mathbf{x}=\left[ \begin{array}{c}{\mathbf{p}} \\ {\mathbf{v}} \\ {\mathbf{q}} \\ {\boldsymbol{\omega}}\end{array}\right], \quad \mathbf{i}=\left[ \begin{array}{c}{\mathbf{v}_{i}} \\ {\boldsymbol{\omega}_{i}}\end{array}\right]
+$$
+
+$$
+\begin{array}{l}{\mathbf{p} \leftarrow \mathbf{p}+\mathbf{v} \delta t} \\ {\mathbf{v} \leftarrow \mathbf{v}+\mathbf{v}_{i}} \\ {\mathbf{q} \leftarrow \mathbf{q} \otimes \mathbf{q}\{\omega \delta t\}} \\ {\boldsymbol{\omega} \leftarrow \boldsymbol{\omega}+\boldsymbol{\omega}_{i}}\end{array}
+$$
+
+#### 匀加速度模型
+
+> 适用于运动比较平滑的时候，因为加速度无法突变
+
+$$
+\mathbf{x}=\left[ \begin{array}{c}{\mathbf{p}} \\ {\mathbf{v}} \\ {\mathbf{a}} \\ {\mathbf{q}} \\ {\boldsymbol{\omega}} \\ {\boldsymbol{\alpha}}\end{array}\right],\mathbf{i}=\left[ \begin{array}{c}{\mathbf{a}_{i}} \\ {\boldsymbol{\alpha}_{i}}\end{array}\right]
+$$
+
+
+
+更新方式：
+$$
+\begin{array}{l}{\mathbf{p} \leftarrow \mathbf{p}+\mathbf{v} \delta t+\frac{1}{2} \mathbf{a} \delta t^{2}} \\ {\mathbf{v} \leftarrow \mathbf{v}+\mathbf{a} \delta t} \\ {\mathbf{a} \leftarrow \mathbf{a}+\mathbf{a}_{i}} \\ {\mathbf{q} \leftarrow \mathbf{q} \otimes \mathbf{q}\left\{\boldsymbol{\omega} \delta t+\frac{1}{2} \boldsymbol{\alpha} \delta t^{2}\right\}} \\ {\boldsymbol{\omega} \leftarrow \boldsymbol{\omega}+\boldsymbol{\alpha} \delta t} \\ {\boldsymbol{\alpha} \leftarrow \boldsymbol{\alpha}+\boldsymbol{\alpha}_{i}}\end{array}
+$$
+
+
+#### 里程计模型
+
+> 适用于轮式和腿型机器人，控制信号$\mathbf{u}$直接作用于机器人当前状态，带来位姿的局部增量，通过对微小增量的积分可以得到完整的轨迹。
+
+`2D`
+
+控制信号为：$\mathbf{u}=[\delta \mathbf{p}, \delta \theta] \in \mathbb{R}^{3}$
+$$
+\mathbf{x}=\left[ \begin{array}{c}{\mathbf{p}} \\ {\theta}\end{array}\right], \quad \mathbf{u}=\left[ \begin{array}{c}{\delta \mathbf{p}} \\ {\delta \theta}\end{array}\right], \quad \mathbf{i}=\left[ \begin{array}{c}{\delta \mathbf{p}_{i}} \\ {\delta \theta_{i}}\end{array}\right]
+$$
+
+
+模型更新为：$\mathbf{x} \leftarrow f(\mathbf{x}, \mathbf{u}, \mathbf{i})$
+$$
+\begin{array}{l}{\mathbf{p} \leftarrow \mathbf{p}+\mathbf{R}\{\theta\}\left(\delta \mathbf{p}+\delta \mathbf{p}_{i}\right)} \\ {\theta \leftarrow \theta+\delta \theta+\delta \theta_{i}}\end{array}
+$$
+对应的$Jacobian$矩阵为：
+$$
+\mathbf{F}_{x}=\left[ \begin{array}{ccc}{1} & {0} & {(-d x \sin \theta-d y \cos \theta)} \\ {0} & {1} & {(d x \cos \theta-d y \sin \theta)} \\ {0} & {0} & {1}\end{array}\right], \quad \mathbf{F}_{i}=\left[ \begin{array}{ccc}{\cos \theta} & {-\sin \theta} & {0} \\ {\sin \theta} & {\cos \theta} & {0} \\ {0} & {0} & {1}\end{array}\right]
+$$
+
+> 推导过程，展开即可:$\delta \mathbf{p} =(\delta x,\delta y)^{\top}$
+
+`3D`
+
+控制信号为：$\mathbf{u}=[\delta \mathbf{p}, \delta \boldsymbol{\theta}] \in \mathbb{R}^{6}$
+$$
+\mathbf{x}=\left[ \begin{array}{c}{\mathbf{p}} \\ {\mathbf{q}}\end{array}\right], \quad \mathbf{u}=\left[ \begin{array}{c}{\delta \mathbf{p}} \\ {\delta \boldsymbol{\theta}}\end{array}\right], \quad \mathbf{i}=\left[ \begin{array}{c}{\delta \mathbf{p}_{i}} \\ {\delta \boldsymbol{\theta}_{i}}\end{array}\right]
+$$
+
+$$
+\begin{array}{l}{\mathbf{p} \leftarrow \mathbf{p}+\mathbf{R}\{\mathbf{q}\}\left(\delta \mathbf{p}+\delta \mathbf{p}_{i}\right)} \\ {\mathbf{q} \leftarrow \mathbf{q} \otimes \mathbf{q}\left\{\delta \boldsymbol{\theta}+\delta \boldsymbol{\theta}_{i}\right\}}\end{array}
+$$
+
+对应的坐标系更新：
+$$
+\mathbf{x} \leftarrow \mathbf{x} \oplus\left[\delta \mathbf{p}+\delta \mathbf{p}_{i}, \mathbf{q}\left\{\delta \boldsymbol{\theta}+\delta \boldsymbol{\theta}_{i}\right\}\right]
+$$
+
+
+#### 差速轮模型(2D)
+
+> 两个轮子的移动机器人，且机器人中心为两个轮子轴中心
+
+模型的主要参数有两个：
+
++ 轮子之间的距离$d$
++ 轮子半径$r$
+
+测量值主要通过两个轮子上的编码器获得的角度增量来计算。在时间间隔$  \delta t$内，左右轮角度增量为：$\delta \psi_{L}, \delta \psi_{R}$。当时间间隔$\delta t$较小的时候，对应的角度增量$\delta \theta$也为一个小量，左右轮共同作用：
+
++ 共模分量：导致$x$方向上的平移
++ 差模分量：导致$z$轴方向的旋转
+
+`数学模型`如下：
+$$
+\begin{aligned} \delta x &=\frac{r\left(\delta \psi_{R}+\delta \psi_{L}\right)}{2} \\ \delta y &=0 \\ \delta \theta &=\frac{r\left(\delta \psi_{R}-\delta \psi_{L}\right)}{d} \end{aligned}
+$$
+对应的2D控制步长为：
+$$
+\mathbf{u}=\left[ \begin{array}{c}{\delta \mathbf{p}} \\ {\delta \theta}\end{array}\right]=\left[ \begin{array}{l}{\delta x} \\ {\delta y} \\ {\delta \theta}\end{array}\right]
+$$
+对其进行积分即可获取其轨迹，协方差$\mathbf{Q}$ 可以通过测量的角度获得。
+$$
+\mathbf{Q}=\mathbf{J} \mathbf{Q}_{\psi} \mathbf{J}^{\top}
+$$
+其中$\mathbf{J}$为上述数学模型的$Jacobian$矩阵，$\mathbf{Q_{\psi}}$为轮子编码器测量角度的协方差矩阵。
+$$
+\mathbf{J}=\left[ \begin{array}{cc}{r / 2} & {r / 2} \\ {0} & {0} \\ {r / d} & {-r / d}\end{array}\right]
+,\mathbf{Q}_{\psi}=\left[ \begin{array}{cc}{\sigma_{\psi}^{2}} & {0} \\ {0} & {\sigma_{\psi}^{2}}\end{array}\right]
+$$
