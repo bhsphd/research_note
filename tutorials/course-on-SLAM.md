@@ -168,8 +168,9 @@ $$
 \mathbf{x} \leftarrow \mathbf{x} \oplus\left[\delta \mathbf{p}+\delta \mathbf{p}_{i}, \mathbf{q}\left\{\delta \boldsymbol{\theta}+\delta \boldsymbol{\theta}_{i}\right\}\right]
 $$
 
+#### 差速轮模型(2D)编码器
 
-#### 差速轮模型(2D)
+关于差速轮机器人运动模型的推导见:[2WD推导](./reference/2wd_ref.md)
 
 > 两个轮子的移动机器人，且机器人中心为两个轮子轴中心
 
@@ -200,3 +201,68 @@ $$
 \mathbf{J}=\left[ \begin{array}{cc}{r / 2} & {r / 2} \\ {0} & {0} \\ {r / d} & {-r / d}\end{array}\right]
 ,\mathbf{Q}_{\psi}=\left[ \begin{array}{cc}{\sigma_{\psi}^{2}} & {0} \\ {0} & {\sigma_{\psi}^{2}}\end{array}\right]
 $$
+
+即：$\left[ \delta x,\delta y,\delta \theta \right]^{\top}$对$\left[\psi_{L},\psi_{R} \right]^{\top}$的$Jacobian$矩阵。
+
+
+
+`注意`：当$\delta \theta$不是小量的时候，需要另外考虑$y$方向上的位移，这里忽略，有需要再查询。
+
+
+
+#### Twist Control model (2D)
+
+速度控制模型，对于2D机器人较为常见，通过控制其自身坐标系下的线速度和角速度来完成对机器人的控制：
+$$
+\left[ \begin{array}{c}{\mathbf{v}} \\ {\omega}\end{array}\right]=\left[ \begin{array}{c}{v_{x}} \\ {v_{y}} \\ {\omega}\end{array}\right]
+$$
+由于轮子一般只能前后向移动，所以$v_y$一般情况下为0。整个输入为两个标量$[v, \omega]$，其中$v=v_x$。
+
+假定控制时间间隔为$\delta t$，则：
+$$
+\begin{aligned} \delta x &=v_{x} \delta t=v \delta t \\ \delta y &=v_{y} \delta t=0 \\ \delta \theta &=\omega \delta t \end{aligned}
+$$
+接下来只需要将其整合成一个2D odometry 步长即可。
+$$
+\mathbf{u}=\left[ \begin{array}{c}{\delta \mathbf{p}} \\ {\delta \theta}\end{array}\right]=\left[ \begin{array}{c}{\delta x} \\ {\delta y} \\ {\delta \theta}\end{array}\right]
+$$
+协方差的估计：
+
+设Twist为$\mathbf{Q}_v$：
+$$
+\mathbf{Q}=\mathbf{J} \mathbf{Q}_{v} \mathbf{J}^{\top} \delta t
+$$
+
+$$
+\mathbf{J}=\left[ \begin{array}{ccc}{1} & {0} & {0} \\ {0} & {1} & {0} \\ {0} & {0} & {1}\end{array}\right], \quad \mathbf{Q}_{v}=\left[ \begin{array}{ccc}{\sigma_{v x}^{2}} & {0} & {0} \\ {0} & {\sigma_{v y}^{2}} & {0} \\ {0} & {0} & {\sigma_{\omega}^{2}}\end{array}\right]
+$$
+
+$\mathbf{J}$为$\mathbf{u}$对Twist的$Jacobian$矩阵。
+
+#### IMU-Driven模型(3D only)
+
+IMU的测量值为线加速度$\mathbf{a}_S$和角速度$\mathbf{\omega}_S$用于直接预测机器人的位姿
+$$
+\mathbf{x}=\left[ \begin{array}{c}{\mathbf{p}} \\ {\mathbf{v}} \\ {\mathbf{q}} \\ {\mathbf{a}_{b}} \\ {\omega_{b}}\end{array}\right], \quad \mathbf{u}=\left[ \begin{array}{c}{\mathbf{a}_{S}} \\ {\boldsymbol{\omega}_{S}}\end{array}\right], \quad \mathbf{i}=\left[ \begin{array}{c}{\mathbf{v}_{i}} \\ {\boldsymbol{\theta}_{i}} \\ {\mathbf{a}_{i}} \\ {\boldsymbol{\omega}_{i}}\end{array}\right]
+$$
+
+$$
+\begin{aligned} \mathbf{p} & \leftarrow \mathbf{p}+\mathbf{v} \Delta t+\frac{1}{2}\left(\mathbf{R}\{\mathbf{q}\}\left(\mathbf{a}_{S}-\mathbf{a}_{b}\right)+\mathbf{g}\right) \Delta t^{2} \\ \mathbf{v} & \leftarrow \mathbf{v}+\left(\mathbf{R}\{\mathbf{q}\}\left(\mathbf{a}_{S}-\mathbf{a}_{b}\right)+\mathbf{g}\right) \Delta t+\mathbf{v}_{i} \\ \mathbf{q} & \leftarrow \mathbf{q} \otimes \mathbf{q}\left\{\left(\boldsymbol{\omega}_{S}-\boldsymbol{\omega}_{b}\right) \Delta t+\boldsymbol{\theta}_{i}\right\} \\ \mathbf{a}_{b} & \leftarrow \mathbf{a}_{b}+\mathbf{a}_{i} \\ \omega_{b} & \leftarrow \boldsymbol{\omega}_{b}+\boldsymbol{\omega}_{i} \end{aligned}
+$$
+
+符号含义：
+
++ $\mathbf{p}$：位置
++ $\mathbf{v}$：速度
++ $\mathbf{q}$：姿态四元数
++ $\mathbf{a}_b$：加速度计Bias
++ $\mathbf{w}_b$：陀螺仪的Bias
++ $\mathbf{v}_i$：加速度测量噪声对于时间的积分
++ $\mathbf{\theta}_i$：陀螺仪测量噪声对于时间的积分
++ $\mathbf{a}_i$：加速度计的Bias随机游走
++ $\mathbf{\omega}_i$：陀螺仪的Bias随机游走
+
+
+
+## Environment perception
+
