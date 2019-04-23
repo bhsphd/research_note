@@ -293,3 +293,143 @@ $$
 $$
 \mathbf{x}_{S}=\mathbf{x}_{R} \oplus \mathbf{x}_{R S}
 $$
+
+
+
+### 常用的传感器以及建模
+
+#### 2D激光雷达
+
+通过记录激光束反射回来的时间来计算距离,返回的测量数据为$N$维范围值$d_i$与对应的方位角$\alpha _i$相关联.
+$$
+[d_1,d_2,\cdots d_N]
+$$
+对应的2D点坐标$\boldsymbol{\pi}_{i}^{S}=\left[x_{i}^{S}, y_{i}^{S}\right]^{\top}$与相关联的方位角$\alpha_i$与距离$d_i$的关系如下:
+$$
+\left[ \begin{array}{c}{\alpha_{i}} \\ {d_{i}}\end{array}\right]=\operatorname{polar}_{2}\left(\boldsymbol{\pi}^{S}\right) \triangleq\left[\frac{\arctan \left(y^{S}, x^{S}\right)}{\sqrt{\left(y^{S}\right)^{2}+\left(x^{S}\right)^{2}}}\right]
+$$
+转换成全局坐标系下的表示为$(\mathbf{p},\theta)$,可以得到完整的观测模型:
+$$
+\left[ \begin{array}{c}{\alpha_{i}} \\ {d_{i}}\end{array}\right]=\operatorname{polar}_{2}(\mathbf{R}\{\theta\}(\boldsymbol{\pi}-\mathbf{p}))
+$$
+示意图如下:
+
+![556028766220](./figures/2d_laser.png)
+
+从激光雷达获得的每个输出值都可以转换成2D全局坐标系下的坐标:
+$$
+\boldsymbol{\pi}_{i}=\mathbf{p}+d_{i} \mathbf{R}\{\theta\} \left[ \begin{array}{c}{\cos \alpha_{i}} \\ {\sin \alpha_{i}}\end{array}\right]
+$$
+`注意`:由于激光雷达在进行扫描的时候,载具并不一定是静止的,所以不能够忽略速度带来的影响.通常激光雷达的扫描间隔为100ms左右.
+
+所以上述模型可以修改为带有时间参数的形式:
+$$
+\boldsymbol{\pi}_{i}=\mathbf{p}\left(t_{i}\right)+d_{i} \mathbf{R}\left\{\theta\left(t_{i}\right)\right\} \left[ \begin{array}{c}{\cos \alpha_{i}} \\ {\sin \alpha_{i}}\end{array}\right]
+$$
+式中$(\mathbf{p},\theta)$ 更改为带有时间参数$t_i$的形式.
+
+时间$t_i$可以从scan的时间戳TS[s]以及扫描的角速度$\omega [rad/s]$与输出强度$\delta [echos/rad]$获得.
+$$
+t_i = TS + \frac{i-i_0}{\delta \omega}
+$$
+
+#### 3D激光雷达
+
+3D激光雷达一般可用通过两种方式获得:2D激光雷达沿着俯仰方向旋转扫描或者用多线的激光雷达
+
+##### 旋转2D激光雷达
+
+$$
+\boldsymbol{\pi}_{i}=\mathbf{p}\left(t_{i}\right)+d_{i} \mathbf{R}\left\{\mathbf{q}\left(t_{i}\right)\right\} \left[ \begin{array}{c}{\cos \alpha_{i}} \\ {\sin \alpha_{i}} \\ {0}\end{array}\right]
+$$
+
+
+
+##### 多线3D激光雷达
+
+多线激光,水平角度不同,一起绕着垂直轴旋转,对于$M$线激光每条线的水平角度为:$\epsilon_{j}, j \in 1 \cdots M$,传感器的输出结果为:
+$$
+\begin{bmatrix}
+d_{11} & d_{12} \cdots d_{1N} \\
+d_{21} & d_{22} \cdots d_{2N} \\
+\vdots  	\\
+d_{M1 } &d_{M2} \cdots d_{MN}
+\end{bmatrix}
+$$
+每一行对应一个$\epsilon_i$,每一列对应一个方位角$\alpha_i$
+$$
+\left[ \begin{array}{c}{\alpha_{i}} \\ {\epsilon_{j}} \\ {d_{j i}}\end{array}\right]=\text { polar }_{3}\left(\boldsymbol{\pi}_{j i}^{C}\right) \triangleq \left[ \begin{array}{c}{\arctan \left(y^{C}, x^{C}\right)} \\ {\arctan \left(z^{C}, \sqrt{\left(x^{C}\right)^{2}+\left(y^{C}\right)^{2}}\right.} \\ {\sqrt{\left(x^{C}\right)^{2}+\left(y^{C}\right)^{2}+\left(z^{C}\right)^{2}}}\end{array}\right]
+$$
+得到的3D观测模型如下:
+$$
+\left[ \begin{array}{c}{\alpha_{i}} \\ {\epsilon_{j}} \\ {d_{j i}}\end{array}\right]=\operatorname{polar}_{3}\left(\mathbf{R}\left\{\mathbf{q}\left(t_{i}\right)\right\}\left(\boldsymbol{\pi}_{j i}-\mathbf{p}\left(t_{i}\right)\right)\right)
+$$
+3D空间坐标可以通过下列公式获得:
+$$
+\boldsymbol{\pi}_{j i}=\mathbf{p}\left(t_{i}\right)+d_{j i} \mathbf{R}\left\{\mathbf{q}\left(t_{i}\right)\right\} \left[ \begin{array}{c}{\cos \alpha_{i} \cos \epsilon_{j}} \\ {\sin \alpha_{i} \cos \epsilon_{j}} \\ {\sin \epsilon_{j}}\end{array}\right]
+$$
+
+
+#### 单目相机模型
+
+透视相机模型用于关联3D空间点$\mathbf{\pi}^C=[x^C,y^C,z^C]$与2D图像平面坐标点$\mathbf{u}=[u,v]^{\top}$,通过投影与像素化两种操作.
+
+![](./figures/mono_camera.png)
+
+左边显示的3D点到2D点的投影,右边为像素化,即从m(米/毫米)到像素的单位变换
+
+##### 针孔相机模型
+
+3D空间点$\boldsymbol{\pi}^{C}=\left[x^{C}, y^{C}, z^{C}\right]^{\top}$ 到单位平面坐标$P=[X, Y]^{\top}$的变换如下
+$$
+\left[ \begin{array}{c}{X} \\ {Y} \\ {1}\end{array}\right] \sim \underline{P}=\left[ \begin{array}{ccc}{f} & {0} & {0} \\ {0} & {f} & {0} \\ {0} & {0} & {1}\end{array}\right] \left[ \begin{array}{l}{x^{C}} \\ {y^{C}} \\ {z^{C}}\end{array}\right] \triangleq \mathbf{K}_{f} \boldsymbol{\pi}^{C}
+$$
+
+##### 像素化
+
+将点$P$坐标转换成像素单位,其中转换系数为:$\left[s_{u}, s_{v}\right]^{\top}[p i x / m]$以及principal point坐标:$\left[u_{0}, v_{0}\right]^{\top}[p i x]$
+
+转换公式为:
+$$
+u=u_{0}+s_{u} X \quad, \quad v=v_{0}+s_{v} Y
+$$
+写成矩阵形式为:
+$$
+\left[ \begin{array}{c}{u} \\ {v} \\ {1}\end{array}\right] \sim \underline{\mathbf{u}}=\left[ \begin{array}{ccc}{s_{u}} & {0} & {u_{0}} \\ {0} & {s_{v}} & {v_{0}} \\ {0} & {0} & {1}\end{array}\right] \left[ \begin{array}{l}{X} \\ {Y} \\ {1}\end{array}\right] \triangleq \mathbf{K}_{s} \underline{P}
+$$
+
+##### 完整模型
+
+完整的透视相机模型如下:
+$$
+\underline{\mathbf{u}}=\mathbf{K}_{s} \mathbf{K}_{f} \boldsymbol{\pi}^{C}=\mathbf{K} \boldsymbol{\pi}^{C}
+$$
+
+$$
+\mathbf{K} \triangleq \mathbf{K}_{s} \mathbf{K}_{f}=\left[ \begin{array}{ccc}{\alpha_{u}} & {0} & {u_{0}} \\ {0} & {\alpha_{v}} & {v_{0}} \\ {0} & {0} & {1}\end{array}\right]
+$$
+
+$\mathbf{K}$即是我们常说的内参矩阵.
+
+如果已知相机的Pose$(\mathbf{p},\mathbf{q})$(通常称为外参)(此处为相机到世界的变换)
+
+整个模型为:
+$$
+\underline{\mathbf{u}}=\mathbf{K} \mathbf{R}\{\mathbf{q}\}^{\top}(\boldsymbol{\pi}-\mathbf{p})
+$$
+其中$\underline{\mathbf{u}}=[u_1,u_2,u_3]^{\top}$
+$$
+\mathbf{u}=\left[ \begin{array}{l}{u} \\ {v}\end{array}\right]=\left[ \begin{array}{l}{u_{1} / u_{3}} \\ {u_{2} / u_{3}}\end{array}\right]
+$$
+由2D图像点获取3D点坐标的方程如下:
+$$
+\boldsymbol{\pi}(r)=\mathbf{p}+r \mathbf{R}\{\mathbf{q}\} \mathbf{v}^{C}, \quad r \in[0, \infty)
+$$
+其中:
+$$
+\mathbf{v}^{C}=\left[ \begin{array}{c}{v_{x}} \\ {v_{y}} \\ {1}\end{array}\right] \sim \mathbf{K}^{-1} \underline{\mathbf{u}}
+$$
+
+
+#### 双目相机模型
+
