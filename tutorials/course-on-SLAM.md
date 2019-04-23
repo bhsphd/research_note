@@ -266,3 +266,30 @@ $$
 
 ## Environment perception
 
+### 常见的传感器
+
++ 2D/3D激光雷达
++ 单目/双目相机
++ RGBD相机
+
+`Range`:到障碍物的距离
+`Bearing`:障碍物的方向
+
+### 环境感知建模
+
+#### 观测模型
+
+通常的观测模型可以写作：
+$$
+\mathbf{z}=h(\mathbf{x})+\mathbf{v}, \quad \mathbf{v} \sim \mathcal{N}\{0, \mathbf{R}\}
+$$
+其中$\mathbf{x}$为状态向量，$\mathbf{z}$为测量值，$h(\cdot)$为非线性函数，$\mathbf{v}$为测量噪声，协方差矩阵为$\mathbf{R}$。通$h(\cdot)$只依赖于$\mathbf{x}$的一部分：机器人状态$\mathbf{x}_{R}$以及路标$\mathbf{x}_{L}$。
+
+观测模型写作：
+$$
+\mathbf{z}=h\left(\mathbf{x}_{R}, \mathbf{x}_{L}\right)+\mathbf{v}, \quad \mathbf{v} \sim \mathcal{N}\{0, \mathbf{R}\}
+$$
+由于传感器直接获得的Pose信息通常为传感器坐标系下的，所以还需要获得$\mathbf{x}_{RS}$即使传感器坐标系相对于机器人坐标系的Pose。
+$$
+\mathbf{x}_{S}=\mathbf{x}_{R} \oplus \mathbf{x}_{R S}
+$$
