@@ -22,6 +22,7 @@ B=\left[ \begin{array}{c}{\mathbf{t}} \\ {\mathbf{q}}\end{array}\right] \in \mat
 $$
 其中$\mathbf{q}=\left[q_{w}, q_{x}, q_{y}, q_{z}\right]^{\top}$
 
+
 #### 坐标系变换
 
 不同坐标系之间的点与向量之间的变换，假设载体坐标系为：$B=(\mathbf{t}, \Phi)$
@@ -502,5 +503,112 @@ $$
 + 机器人控制输入：$U=\left\{\mathbf{u}_{i}\right\}, \quad i \in 1 \cdots M$
 + 对路标点的观测：$Z=\left\{\mathbf{z}_{k}\right\}, \quad k \in 1 \cdots K$
 
+由运动模型可以得到：
+$$
+\mathbf{x}_{i}=f_{i}\left(\mathbf{x}_{i-1}, \mathbf{u}_{i}\right)+\mathbf{w}_{i}
+$$
+在图中的表示为一个子图，结构如下：
+
+![](figures/sub_graph.png)
+
+同样对于观测数据，可以建模成如下形式：
+$$
+\mathbf{z}_{k}=h_{k}\left(\mathbf{x}_{i}, \mathbf{m}\right)+\mathbf{v}_{k}
+$$
+![](./figures/subgraph_observation.png)
+
+当抽象的Map用一个一个LandMark来表示的时候：
+$$
+\mathbf{z}_{k}=h_{k}\left(\mathbf{x}_{i}, \mathbf{l}_{j}\right)+\mathbf{v}_{k}
+$$
+![](./figures/sub_graph_landmark.png)
+
+利用上述形式构建的DBN包含了所有变量之间的依赖关系，意味着不在图中出现的任何变量都是独立的，于是所有变量的联合概率分布可以写作：
+$$
+P(X, L, U, Z) \propto P\left(\mathbf{x}_{0}\right) \prod_{i=1}^{M} P\left(\mathbf{x}_{i} | \mathbf{x}_{i-1}, \mathbf{u}_{i}\right) \prod_{k=1}^{K} P\left(\mathbf{z}_{k} | \mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)
+$$
+其中$P(\mathbf{x}_0)$表示机器人初始Pose的先验概率。于是整个SLAM问题便可以转化成寻找一组$X^{*}, L^{*}$，满足：
+$$
+\left\{X^{*}, L^{*}\right\}=\underset{X, L}{\arg \max } P\left(\mathbf{x}_{0}\right) \prod_{i=1}^{M} P\left(\mathbf{x}_{i} | \mathbf{x}_{i-1}, \mathbf{u}_{i}\right) \prod_{k=1}^{K} P\left(\mathbf{z}_{k} | \mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)
+$$
+
 #### SLAM as Factor Graph
 
+因子图方式建模SLAM问题，上述公式由$M+K$个因子构成，状态量:Poses和LandMarks用圆表示，因子：controls和measurements用方块表示。
+
+![](./figures/factor_graph.png)
+
+因子图为一个二分图，Node有两种类型：`states`和`factors`(用来表示state之间的约束)。
+
+##### 模型如下：
+
+`机器人运动模型`
+$$
+\mathbf{x}_{i}=f_{i}\left(\mathbf{x}_{i-1}, \mathbf{u}_{i}\right)+\mathbf{w}_{i}, \quad \mathbf{w}_{i} \sim \mathcal{N}\left\{0, \mathbf{\Omega}_{i}^{-1}\right\}
+$$
+`路标观测模型`
+$$
+\mathbf{z}_{k}=h_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)+\mathbf{v}_{k}, \quad \mathbf{v}_{k} \sim \mathcal{N}\left\{0, \mathbf{\Omega}_{k}^{-1}\right\}
+$$
+
+噪声$\mathbf{w}_i$ 和$\mathbf{v}_k$ 服从高斯分布，且对应的协方差矩阵为：$\mathbf{\Omega}_i^{-1}$和$\mathbf{\Omega}_k^{-1}$($\mathbf{\Omega}$为信息矩阵)。
+
+于是可以得到因子$\phi$：
+$$
+\phi_{i}=P\left(\mathbf{x}_{i} | \mathbf{x}_{i-1}, \mathbf{u}_{i}\right) \propto \exp \left(-\frac{1}{2}\left(\mathbf{x}_{i}-f_{i}\left(\mathbf{x}_{i-1}, \mathbf{u}_{i}\right)\right)^{\top} \mathbf{\Omega}_{i}\left(\mathbf{x}_{i}-f_{i}\left(\mathbf{x}_{i-1}, \mathbf{u}_{i}\right)\right)\right)
+$$
+$$
+\phi_{k}=P\left(\mathbf{z}_{k} | \mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right) \propto \exp \left(-\frac{1}{2}\left(\mathbf{z}_{k}-h_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)\right)^{\top} \mathbf{\Omega}_{k}\left(\mathbf{z}_{k}-h_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)\right)\right)
+$$
+
+把误差值$\mathbf{e}_k$用唯一的索引$k$表示：
+
+##### 误差：
+
+`机器人运动误差`
+$$
+\mathbf{e}_{k}\left(\mathbf{x}_{i_{k}-1}, \mathbf{x}_{i_{k}}\right)=f_{i_{k}}\left(\mathbf{x}_{i_{k}-1}, \mathbf{u}_{i_{k}}\right)-\mathbf{x}_{i_{k}}
+$$
+`路标观测误差`
+$$
+\mathbf{e}_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)=h_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)-\mathbf{z}_{k}
+$$
+于是可以把上述的$\phi_i$和$\phi_k$写成一个通用形式：
+$$
+\phi_{k}=\exp \left(-\frac{1}{2} \mathbf{e}_{k}^{\top} \mathbf{\Omega}_{k} \mathbf{e}_{k}\right)
+$$
+把二者写成一个统一的形式，即为：
+$$
+\mathbf{e}_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{x}_{j_{k}}, \mathbf{z}_{k}\right)
+$$
+不必再区分是运动因子还是观测因子，后续的建模过程只需要考虑两种变量：需要估计的状态和观测数据。
+需要估计的状态为$\{X,L\}$，其中$X$为状态向量，由N块数据构成：
+$$
+\mathbf{x}=\left[ \begin{array}{lll}{\mathbf{x}_{1}} & {\cdots} & {\mathbf{x}_{N}}\end{array}\right]^{\top}
+$$
+$\mathbf{x}_i$为机器人的状态或者是路标的状态。
+观测数据$\mathbf{z}=\{U,Z\}$由K块组成。
+$$
+\mathbf{z}=\left[ \begin{array}{lll}{\mathbf{z}_{1}} & {\cdots} & {\mathbf{z}_{K}}\end{array}\right]^{\top}
+$$
+包括控制量和观测值。
+
+对于每一个观测数据$\mathbf{z}_k$都可以对其计算误差$\mathbf{e}_k$以及对应的因子$\phi_k$，于是联合概率分布可以写成所有因子的乘积的形式：
+$$
+P(\mathbf{x}, \mathbf{z}) \propto \prod_{k=1}^{K} \phi_{k} \propto \prod_{k=1}^{K} \exp \left(-0.5 \mathbf{e}_{k}^{\top} \mathbf{\Omega}_{k} \mathbf{e}_{k}\right)
+$$
+最大化其概率分布函数(PDF)等价于最小化其负对数函数，即cost为：
+$$
+\mathbf{F}(\mathbf{x}) \triangleq-\log P(\mathbf{x}, \mathbf{z})=\sum_{k=1}^{K} \mathbf{F}_{k}=\sum_{k=1}^{K} \mathbf{e}_{k}\left(\mathbf{x}_{i}, \mathbf{x}_{j}\right)^{\top} \mathbf{\Omega}_{k} \mathbf{e}_{k}\left(\mathbf{x}_{i}, \mathbf{x}_{j}\right)
+$$
+求解的目标函数为：
+$$
+\mathbf{x}^{*}=\underset{\mathbf{x}}{\arg \min } \sum_{k=1}^{K} \mathbf{e}_{k}\left(\mathbf{x}_{i}, \mathbf{x}_{j}\right)^{\top} \mathbf{\Omega}_{k} \mathbf{e}_{k}\left(\mathbf{x}_{i}, \mathbf{x}_{j}\right)
+$$
+同时我们注意到，$\mathbf{F}_k=-\log\phi_k$大于等于误差$\mathbf{e}_{k}=\mathbf{e}_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{x}_{j_{k}}\right)$的马氏距离的平方。
+$$
+\mathbf{F}_{k} \propto -\log \phi_{k}  \propto  \mathbf{e}_{k}^{\top} \Omega_{k} \mathbf{e}_{k}=\left\|\mathbf{e}_{k}\right\|_{\Omega_{k}^{-1}}^{2}=\left\|\Omega_{k}^{\top / 2} \mathbf{e}_{k}\right\|^{2}
+$$
+
+
+##### Motion Error的一些说明
