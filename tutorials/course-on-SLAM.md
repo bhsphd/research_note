@@ -433,3 +433,74 @@ $$
 
 #### 双目相机模型
 
+通过第二个ViewPoint去获取深度数据，从而获得3D点准确的3D位置，最简单的模型为标准模型，即：两个独立的针孔模型相机构成，两相机光轴平行且图像平面共面。为了方便讨论，假定两个光轴$O_L$和$O_R$同在$x^C$轴上。光心之间的距离$b$即为通常所说的基线。通常使用左边相机的$(x^C,y^C,z^C)$三轴作为双目相机的局部坐标系。示意图如下：
+
+![](./figures/stero_camera.png)
+
+给定一个空间3D点:$\boldsymbol{\pi}^{C}=\left[x^{C}, y^{C}, z^{C}\right]^{\top}$对应的左右相机像素坐标分别为：
+$$
+\left[ \begin{array}{c}{u_{L}} \\ {v_{L}} \\ {1}\end{array}\right] \sim \underline{\mathbf{u}}_{L}=\mathbf{K} \left[ \begin{array}{c}{x^{C}} \\ {y^{C}} \\ {z^{C}}\end{array}\right] \quad, \quad \left[ \begin{array}{c}{u_{R}} \\ {v_{R}} \\ {1}\end{array}\right] \sim \underline{\mathbf{u}}_{R}=\mathbf{K} \left[ \begin{array}{c}{x^{C}-b} \\ {y^{C}} \\ {z^{C}}\end{array}\right]
+$$
+从中可以看出两边像素的垂直方向坐标相同$v_L=v_R$意味着有冗余数据。且二者满足：
+$$
+u_{L}-u_{R}=\alpha_{u} \frac{x^{C}-\left(x^{C}-b\right)}{z^{C}}=\alpha_{u} \frac{b}{z^{C}}
+$$
+
+> 注：$\alpha_u$为$f_x$
+
+通过这个方程我们可以获取到深度值$z^C$，定义像素测量值：$(u,v)$与视差$d$
+$$
+u \triangleq u_{L} \quad, \quad v \triangleq v_{L} \quad, \quad d \triangleq u_{L}-u_{R}
+$$
+于是可以进一步得到双目相机的观测模型：
+$$
+\mathbf{s}=\left[ \begin{array}{l}{u} \\ {v} \\ {d}\end{array}\right]=\left[ \begin{array}{c}{u_{0}+\alpha_{u} x^{C} / z^{C}} \\ {v_{0}+\alpha_{v} y^{C} / z^{C}} \\ {\alpha_{u} b / z^{C}}\end{array}\right]
+$$
+如果视差不为0，可以通过逆向操作获取3D空间点坐标：$\mathbf{s}=[u, v, d]^{\top}$
+$$
+\boldsymbol{\pi}^{C}=\left[ \begin{array}{c}{x^{C}} \\ {y^{C}} \\ {z^{C}}\end{array}\right]=\frac{\alpha_{u} b}{d} \left[ \begin{array}{c}{\left(u-u_{0}\right) / \alpha_{u}} \\ {\left(v-v_{0}\right) / \alpha_{v}} \\ {1}\end{array}\right], \quad d>0
+$$
+转换到global坐标系下的结果为：
+$$
+\boldsymbol{\pi}=\mathbf{p}+\frac{\alpha_{u} b}{d} \mathbf{R}\{\mathbf{q}\} \left[ \begin{array}{c}{\left(u-u_{0}\right) / \alpha_{u}} \\ {\left(v-v_{0}\right) / \alpha_{v}} \\ {1}\end{array}\right]
+$$
+视差为0的情况一般发生在左右相机的对应点在非常远的地方，理想情况为无穷远。在这种情况下，双目相机退化为一个单目相机。当基线长度与离物体的距离差的非常大的时候会发生这种情况。一般基线的30倍较为正常。
+
+**利用极线双目匹配**
+
+利用对极几何的极线约束，进行对应点的搜索，理想情况下可以假定$v_R=v_L$。
+利用图像块匹配的方法进行搜索。通常有$3\times 3$或者$11\times 11$的Patch，完成匹配之后可以获得双目测量值$(u,v,d)$。具体算法如下：
+
+![](./figures/algorithm.png)
+
+双目的弱点在于：低纹理或者重复图案较多的地方，可能会有多个相似度差不多的对应关系。常见的相似度指标如下：d
+
+![](./figures/stereo_match_score.png)
+
+#### GPS、罗盘(磁力计)、高度计等
+
+## Graph-based SLAM
+
+### 问题建模
+
+![](figures/graph_model.png)
+
+左图为实际的运动位置，右边为构建的图模型示意图，蓝色的边为相对运动测量值，红色的边为观测到路标点。
+
+#### SLAM as Dynamic Bayes Network
+
+动态贝叶斯网络(DBN)为概率图模型，表示随机变量以及之间的依赖关系(条件概率)。为一个有向无环图。$A\leftarrow B$表示A依赖于B，没有回环可以避免A依赖于B,B依赖于C,C依赖于A的情况。
+
+![](figures/dbn_graph.png)
+
+从A到B的箭头表明B依赖于A：$x$为状态值，$u$为控制输入,$z$为观测值,$m$表示地图，$I$为单独的路标点。
+
+变量及含义：
+
++ 机器人的状态：$X=\left\{\mathbf{x}_{i}\right\}, \quad i \in 0 \cdots M$
++ 路标点的状态：$L=\left\{\mathbf{I}_{j}\right\}, \quad j \in 1 \cdots N$
++ 机器人控制输入：$U=\left\{\mathbf{u}_{i}\right\}, \quad i \in 1 \cdots M$
++ 对路标点的观测：$Z=\left\{\mathbf{z}_{k}\right\}, \quad k \in 1 \cdots K$
+
+#### SLAM as Factor Graph
+
