@@ -645,3 +645,95 @@ $$
 \mathbf{e}=g\left(\mathbf{x}_{i}, \mathbf{x}_{i-1}\right)-\mathbf{z}_{i} \sim \mathcal{N}\left\{0, \mathbf{\Omega}^{-1}\right\}
 $$
 
+
+
+### 迭代非线性优化
+
+对于一个代价函数$\mathbf{F}(\mathbf{x})$,最优状态量为$\mathbf{x}^*$满足:
+$$
+\mathbf{x}^{*}=\underset{\mathbf{x}}{\arg \min } \mathbf{F}(\mathbf{x})
+$$
+所有基于迭代的算法都通过一系列的步长去逐步接近最优解,即:$\mathbf{x}_n=\mathbf{x}_{n-1}+\Delta \mathbf{x}_n$,通常流程如下:
+
++ 在某个状态$\breve{\mathbf{X}}$附近使用解析形式对$\mathbf{F}(\mathbf{x})$进行近似
++ 求解在这种形式下的迭代步长$\Delta \mathbf{x}$
++ 更新状态$\breve{\mathbf{x}} \leftarrow \breve{\mathbf{x}}+\Delta \mathbf{x}$
++ 迭代直到收敛
+
+#### 常见形式与牛顿法
+
+牛顿法近似方式为:
+$$
+\mathbf{F}(\breve{\mathbf{x}}+\Delta \mathbf{x}) \approx \mathbf{F}(\breve{\mathbf{x}})+\nabla \mathbf{F} \Delta \mathbf{x}+\frac{1}{2} \Delta \mathbf{x}^{\top} \mathbf{H}_{\mathbf{F}} \Delta \mathbf{x}
+$$
+$\breve{\mathbf{x}}=\mathbf{x}_{n-1}$,使用二阶泰勒展开近似.
+
+其中$\nabla \mathbf{F} $和$ \mathbf{H}_{\mathbf{F}}$分别表示$\mathbf{F}$的梯度向量和海塞矩阵:
+$$
+\nabla \mathbf{F} \triangleq\left.\frac{\partial \mathbf{F}}{\partial \mathbf{x}}\right|_{\breve{\mathbf{x}}},\mathbf{H}_{\mathbf{F}} \triangleq\left.\frac{\partial^{2} \mathbf{F}}{\partial \mathbf{x}^{2}}\right|_{\check{\mathbf{x}}}
+$$
+![](figures/newton_approximate.png)
+
+牛顿法近似在选取的近似点不同的时候,最后迭代收敛的最优解也不同.
+
+迭代的最优步长$\Delta \mathbf{x}^*$可以通过对近似方程求导并令导数为0获得:
+$$
+\nabla \mathbf{F}^{\top}+\mathbf{H}_{\mathbf{F}} \Delta \mathbf{x}^{*}=0
+$$
+
+
+#### 最小二乘与高斯牛顿法
+
+在许多情况下,我们的误差函数为关于误差向量的二次函数:
+$$
+\mathbf{F}(\mathbf{x})=\frac{1}{2} \mathbf{e}(\mathbf{x})^{\top} \mathbf{\Omega} \mathbf{e}(\mathbf{x})
+$$
+$\mathbf{\Omega}$为对称矩阵且正定.于是梯度向量$\nabla \mathbf{F}$和$\mathbf{H}_{\mathbf{F}}$的形式如下:
+$$
+\nabla \mathbf{F}=\left.\frac{\partial \mathbf{F}}{\partial \mathbf{x}}\right|_{\breve{\mathbf{x}}}=\left.\left(\mathbf{e}^{\top} \Omega \frac{\partial \mathbf{e}}{\partial \mathbf{x}}\right)\right|_{\breve{\mathbf{x}}}=\breve{\mathbf{e}}^{\top} \boldsymbol{\Omega} \mathbf{J}
+$$
+
+$$
+\mathbf{H}_{\mathrm{F}}=\left.\frac{\partial^{2} \mathbf{F}}{\partial \mathbf{x}^{2}}\right|_{\overline{\mathbf{x}}}=\left.\left(\frac{\partial \mathbf{e}}{\partial \mathbf{x}} \boldsymbol{\Omega} \frac{\partial \mathbf{e}}{\partial \mathbf{x}}+\mathbf{e}^{\top} \boldsymbol{\Omega} \frac{\partial^{2} \mathbf{e}}{\partial \mathbf{x}^{2}}\right)\right|_{\breve{\mathbf{x}}}==\mathbf{J}^{\top} \Omega \mathbf{J}+\breve{\mathbf{e}}^{\top} \boldsymbol{\Omega} \mathcal{H}
+$$
+
+其中:
+$$
+\breve{\mathbf{e}} \triangleq \mathbf{e}(\breve{\mathbf{x}}) \quad \text{is error vector} \\ 
+\mathbf{J} \triangleq\left.\frac{\partial \mathbf{e}}{\partial \mathbf{x}}\right|_{\breve{\mathbf{x}}} \text{Jacobian matrix } \\
+\mathcal{H} \triangleq\left.\frac{\partial^{2} \mathbf{e}}{\partial \mathbf{x}^{2}}\right|_{\check{\mathbf{x}}} \text{Hessian tensor}
+$$
+
+> $\mathbf{\Omega}$为信息矩阵,即协方差矩阵的逆,通常为对角阵,或者有些块为对角阵
+
+对误差函数进行近似展开得:
+$$
+\mathbf{F}(\breve{\mathbf{x}}+\Delta \mathbf{x}) \approx \frac{1}{2} \breve{\mathbf{e}}^{\top} \boldsymbol{\Omega} \breve{\mathbf{e}}+\breve{\mathbf{e}}^{\top} \boldsymbol{\Omega} \mathbf{J} \Delta \mathbf{x}+\frac{1}{2} \Delta \mathbf{x}^{\top}\left(\mathbf{J}^{\top} \boldsymbol{\Omega} \mathbf{J}+\breve{\mathbf{e}}^{\top} \boldsymbol{\Omega} \mathcal{H}\right) \Delta \mathbf{x}
+$$
+高斯牛顿法的步长计算方式采用的是忽略$\mathbf{H}_{\mathbf{F}}$中的小量:$\breve{\mathbf{e}}^{\top} \boldsymbol{\Omega} \mathcal{H}$,可以得到高斯牛顿法的近似代价函数为:
+$$
+\mathbf{F}(\breve{\mathbf{x}}+\Delta \mathbf{x}) \approx \frac{1}{2} \breve{\mathbf{e}}^{\top} \mathbf{\Omega} \breve{\mathbf{e}}+\breve{\mathbf{e}}^{\top} \mathbf{\Omega} \mathbf{J} \Delta \mathbf{x}+\frac{1}{2} \Delta \mathbf{x}^{\top} \mathbf{J}^{\top} \mathbf{\Omega} \mathbf{J} \Delta \mathbf{x}
+$$
+上述表达式一般可以直接通过对误差进行一阶近似来获得$\mathbf{e}(\breve{\mathbf{x}}+\Delta \mathbf{x}) \approx \breve{\mathbf{e}}+\mathbf{J} \Delta \mathbf{x}$,并对$\mathbf{H}$进行近似,可得:
+$$
+\mathbf{H}_{\mathbf{F}} \approx \mathbf{H} \triangleq \mathbf{J}^{\top} \mathbf{\Omega} \mathbf{J}
+$$
+高斯牛顿法的步长为:
+$$
+\Delta \mathbf{x}_{G N}^{*}=\mathbf{H}^{-1} \nabla \mathbf{F}^{\top}
+$$
+即:
+$$
+\Delta \mathbf{x}_{G N}^{*}=\left(\mathbf{J}^{\top} \mathbf{\Omega} \mathbf{J}\right)^{-1} \mathbf{J}^{\top} \boldsymbol{\Omega} \breve{\mathbf{e}}
+$$
+定义矩阵:
+$$
+\mathbf{J}_{\Omega}^{+} \triangleq\left(\mathbf{J}^{\top} \mathbf{\Omega} \mathbf{J}\right)^{-1} \mathbf{J}^{\top} \boldsymbol{\Omega}
+$$
+其为$\mathbf{J}$的加权广义逆矩阵.于是方程可以改写为:
+$$
+\Delta \mathbf{x}_{G N}^{*}=\mathbf{J}_{\Omega}^{+} \breve{\mathbf{e}}
+$$
+通常$\mathbf{J}_{\Omega}^{+}$不会直接计算,而是通过矩阵相关算法去降低计算复杂度.常用的两种方法为对加权雅克比矩阵$\Omega^{\top / 2} \mathrm{J}$的$QR$分解和
+
+对$\mathbf{H}$矩阵的$Cholesky$分解.矩阵$\mathbf{H}=\mathbf{J}^{\top} \boldsymbol{\Omega} \mathbf{J}$为对海塞矩阵$\mathbf{H}_{\mathbf{F}}$的近似.高斯牛顿法同样也存在着迭代不收敛的情况.
