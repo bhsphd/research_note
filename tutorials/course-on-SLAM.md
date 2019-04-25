@@ -610,5 +610,38 @@ $$
 \mathbf{F}_{k} \propto -\log \phi_{k}  \propto  \mathbf{e}_{k}^{\top} \Omega_{k} \mathbf{e}_{k}=\left\|\mathbf{e}_{k}\right\|_{\Omega_{k}^{-1}}^{2}=\left\|\Omega_{k}^{\top / 2} \mathbf{e}_{k}\right\|^{2}
 $$
 
-
 ##### Motion Error的一些说明
+
+运动模型的误差定义为：
+$$
+\mathbf{e}=f\left(\mathbf{x}_{i-1}, \mathbf{u}_{i}\right)-\mathbf{x}_{i}
+$$
+上文中我们在状态空间定义了误差：
+$$
+\mathbf{x}_{i}=f_{x}\left(\mathbf{x}_{i-1}, \mathbf{u}_{i}\right)+\mathbf{w}_{i}^{\prime} \quad, \quad \mathbf{w}_{i}^{\prime} \sim \mathcal{N}\left\{0, \mathbf{\Omega}^{\prime-1}\right\}
+$$
+但是通常噪声$\mathbf{w}$是与测量值$\mathbf{u}$相关联的，即：
+$$
+\mathbf{x}_{i}=f_{u}\left(\mathbf{x}_{i-1}, \mathbf{u}_{i}-\mathbf{w}_{i}\right) \quad, \quad \mathbf{w}_{i} \sim \mathcal{N}\left\{0, \Omega^{-1}\right\}
+$$
+其信息矩阵为$\mathbf{\Omega}$一般是满秩的，有些时候甚至是对角阵。在前几章关于协方差矩阵的传播需要求雅克比矩阵。如果雅克比矩阵不可逆，那么与$\mathbf{w}^{\prime}$ 相关的协方差矩阵可能为奇异矩阵，即信息矩阵$\mathbf{\Omega}^{\prime}$无法计算。
+为了使误差能够有较好的信息矩阵，一般在将误差定义在观测数据上：
+$$
+\mathbf{u}_{i}=f^{-1}\left(\mathbf{x}_{i}, \mathbf{x}_{i-1}\right)+\mathbf{w}_{i}
+$$
+
+对应的误差写作：
+$$
+\mathbf{e}=f^{-1}\left(\mathbf{x}_{i}, \mathbf{x}_{i-1}\right)-\mathbf{u}_{i}
+$$
+误差定义在测量空间，于是这和路标的测量值有着相同的形式：$\mathbf{e}=h\left(\mathbf{x}_{i}, \mathbf{l}_{j}\right)-\mathbf{z}$。由于运动模型的不同，所以$f^{-1}( )$的形式也不相同。
+
+在一些极端情况下，例如IMU预积分的时候，会寻找测量值的修改版本：$\mathbf{z}=z(\mathbf{u})$ 
+$$
+\mathbf{z}_{i}=g\left(\mathbf{x}_{i}, \mathbf{x}_{i-1}\right)+\mathbf{w}_{i}
+$$
+
+$$
+\mathbf{e}=g\left(\mathbf{x}_{i}, \mathbf{x}_{i-1}\right)-\mathbf{z}_{i} \sim \mathcal{N}\left\{0, \mathbf{\Omega}^{-1}\right\}
+$$
+
