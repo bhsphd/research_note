@@ -338,3 +338,37 @@ $$
 &&&\mathbf{J}_{10,3} &&&&\mathbf{J}_{10,7}
 \end{bmatrix}
 $$
+
+
+
+#### 流形上的优化
+
+2D/3D旋转的参数化方式有时候并不是在欧氏空间进行的,以3D旋转为例:
+`旋转矩阵`:
+使用9个参数来表示3D旋转,有6个约束,且结合方式不满足交换律:$\mathbf{R}_{1} \oplus \mathbf{R}_{2}=\mathbf{R}_{1} \cdot \mathbf{R}_{2}$
+`单位四元数`:
+使用四个参数来表示3D空间旋转,有一个约束,同样不满足交换律:$\mathbf{q}_{1} \oplus \mathbf{q}_{2}=\mathbf{q}_{1} \otimes \mathbf{q}_{2}$
+`欧拉角`:
+用含有$roll,pitch,yaw$三个角的向量来表示3D旋转:$\mathbf{e}_{1} \oplus \mathbf{e}_{2}=\text { compose Euler }\left(\mathbf{e}_{1}, \mathbf{e}_{2}\right)$
+没有约束但是会有gimbal lock问题.
+
+`optimization in the error-space` `optimization in the tangent space` `local parametrization`三种方式都是同一个概念的不同名字而已.
+
+定义$\oplus$: 把欧氏空间的变化映射到流形上的局部增量$\Delta \mathrm{x} \rightarrow \breve{\mathrm{x}} \oplus \Delta \mathrm{x}$
+$$
+\mathbf{x}=\breve{\mathbf{x}} \oplus \Delta \mathbf{x}
+$$
+这使得误差的线性化变化为:
+$$
+\mathbf{e}_{k}(\mathbf{x})=\mathbf{e}_{k}(\breve{\mathbf{x}} \oplus \Delta \mathbf{x}) \approx \breve{\mathbf{e}}_{k}+\mathbf{J}_{k}^{\prime} \Delta \mathbf{x}
+$$
+$\breve{\mathbf{e}}_{k} \triangleq \mathbf{e}_{k}(\breve{\mathbf{x}})$ ,$\mathbf{J}_{k}^{\prime}$为新的$Jacobian$矩阵
+$$
+\mathbf{J}_{k}^{\prime} \triangleq\left.\frac{\partial \mathbf{e}_{k}(\mathbf{x})}{\partial \Delta \mathbf{x}}\right|_{\dot{\mathbf{x}}}=\left[ \begin{array}{cccc}{\cdots} & {\mathbf{J}_{k i}^{\prime}} & {\cdots} & {\mathbf{J}_{k j}^{\prime}} & {\cdots}\end{array}\right]
+$$
+
+$$
+\mathbf{J}_{k i}^{\prime}=\left.\frac{\partial \mathbf{e}_{k}(\mathbf{x})}{\partial \Delta \mathbf{x}_{i}}\right|_{\check{\mathbf{x}}}, \quad \mathbf{J}_{k j}^{\prime}=\left.\frac{\partial \mathbf{e}_{k}(\mathbf{x})}{\partial \Delta \mathbf{x}_{j}}\right|_{\check{\mathbf{x}}}
+$$
+
+> 未完待续
