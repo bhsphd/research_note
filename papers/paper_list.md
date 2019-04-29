@@ -8,7 +8,10 @@
 + Batched tracks selection 
 + Batched bundle adjustment
 ### SLAM&VIO
-
+#### `g2o`: A General Framework for Graph Optimization
+[g2o](./slam/g2o.md)
++ slam solver
++ model slam/ba problem by graph optimization
 
 
 ### Robotic
