@@ -79,6 +79,8 @@ $$
 \phi_{k}=P\left(\mathbf{z}_{k} | \mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right) \propto \exp \left(-\frac{1}{2}\left(\mathbf{z}_{k}-h_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)\right)^{\top} \mathbf{\Omega}_{k}\left(\mathbf{z}_{k}-h_{k}\left(\mathbf{x}_{i_{k}}, \mathbf{I}_{j_{k}}\right)\right)\right)
 $$
 
+> $\propto$的含义是成正比，误差的分布越靠近0，说明参数越接近真实值。
+
 把误差值$\mathbf{e}_k$用唯一的索引$k$表示：
 
 ##### 误差：

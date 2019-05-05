@@ -146,7 +146,7 @@ $$
 
 利用对$\mathbf{H}$矩阵进行舒尔补可以得到：
 $$
-\left(\mathbf{H}_{\mathbf{p p}}-\mathbf{H}_{\mathbf{p l}} \mathbf{H}_{\mathrm{ll}}^{-1} \mathbf{H}_{\mathbf{p l}}^{\top}\right) \Delta \mathbf{x}_{\mathbf{p}}^{*} =-\mathbf{b}_{\mathbf{p}}+\mathbf{H}_{\mathbf{p} 1} \mathbf{H}_{11}^{-1} \mathbf{b}_{1}
+\left(\mathbf{H}_{\mathbf{p p}}-\mathbf{H}_{\mathbf{p l}} \mathbf{H}_{\mathrm{ll}}^{-1} \mathbf{H}_{\mathbf{p_l}}^{\top}\right) \Delta \mathbf{x}_{\mathbf{p}}^{*} =-\mathbf{b}_{\mathbf{p}}+\mathbf{H}_{\mathbf{p_l} } \mathbf{H}_{11}^{-1} \mathbf{b_l}
 $$
 由于$\mathbf{H}^{-1}_{\mathbf{ll}}$计算较为容易，因为$\mathbf{H}_{\mathbf{ll}}$为块对角阵，求解上式可以得到：$\mathbf{\Delta x_{p}}^{*}$进而求解:
 $$
