@@ -12,8 +12,10 @@
 [g2o](./slam/g2o.md)
 + slam solver
 + model slam/ba problem by graph optimization
-
-
+#### `Graph SLAM`: A Tutorial on Graph-based SLAM
++ model slam problem
++ graph slam 
++ optimization on manifold
 ### Robotic
 
 ### Math
