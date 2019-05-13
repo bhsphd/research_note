@@ -16,6 +16,10 @@
 + model slam problem
 + graph slam 
 + optimization on manifold
+`VIO-Benchmark`:
+
+[benmark-mono-vio](./vio/benmark-mono-vio.md)
+
 ### Robotic
 
 ### Math
