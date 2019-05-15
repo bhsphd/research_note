@@ -122,3 +122,33 @@ $$
 p_{t+1|t+1}\left(x_{t+1}\right)=\underbrace{ \overbrace{\frac{1}{p\left(z_{t+1} | z_{0 : t}, u_{0 : t}\right)}}^{\frac{1}{\eta_{t+1}}} p_{h}\left(z_{t+1} | x_{t+1}\right)  \overbrace{\int p_{f}\left(x_{t+1} | x_{t}, u_{t}\right) p_{t | t}\left(x_{t}\right) d x_{t}}^{\mathbf{Predict:}\quad p_{t+1|t}(x_{t+1}) } 
 }_{\mathbf { Update }}
 $$
+
+#### 贝叶斯平滑
+
+##### Smoothing
+
+smoothing 是对所有状态进行track
+$$
+\begin{aligned} p_{t|t}\left(x_{0 : t}\right)  & :=p\left(x_{0 : t} | z_{0 : t}, u_{0 : t-1}\right) \\ p_{t+1 | t}\left(x_{0 : t+1}\right) & :=p\left(x_{0 : t+1} | z_{0 : t}, u_{0 : t}\right) \end{aligned}
+$$
+
+##### Forward pass (Bayes Filter)
+
+对于$t=0,\cdots,T$ ,循环计算$p(x_{t+1}|z_{0:T})$和$p\left(x_{t+1} | z_{0 : t}, u_{0 : t}\right)$ 
+
+##### Backward pass (Bayes smoother)
+
+对于$t=T-1,\cdots,0$循环计算:
+$$
+p\left(x_{t} | z_{0 : T}, u_{0 : T-1}\right) \xlongequal[Probability]{Total} \int p\left(x_{t} | x_{t+1}, z_{0 : T}, u_{0 : T-1}\right) p\left(x_{t+1} | z_{0 : T}, u_{0 : T-1}\right) d x_{t+1} \\
+\xlongequal[Assumption]{Markov}  \int p\left(x_{t} | x_{t+1}, z_{0 : t}, u_{0 : t}\right) p\left(x_{t+1} | z_{0 : T}, u_{0 : T-1}\right) d x_{t+1} \\
+\xlongequal[Rule]{Bayes} \underbrace{p\left(x_{t} | z_{0 : t}, u_{0 : t-1}\right)}_{\text { forward pass }}\int\left[\frac{\overbrace{p_{f}\left(x_{t+1} | x_{t}, u_{t}\right)}^{\text { motion model }} ) p\left(x_{t+1} | z_{0 : T}, u_{0 : T-1}\right)}{\underbrace{p\left(x_{t+1} | z_{0 : t}, u_{0 : t}\right)}_{\text{forward pass}}}\right] dx_{t+1}
+$$
+
+#### 直方图滤波
+
++ 通过直方图的形式，将概率密度函数$p_{t|t}$和$p_{t+1|t}$表示成离散形式
++ 精度依赖于离散化的程度
++ 当离散化程度过高时，导致计算量成指数增长，无法计算
++ 自适应直方图滤波: 离散形式通过自适应的方式来完成，例如:Octrees
+
