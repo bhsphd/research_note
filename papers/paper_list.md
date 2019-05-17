@@ -13,10 +13,11 @@
 + slam solver
 + model slam/ba problem by graph optimization
 #### `Graph SLAM`: A Tutorial on Graph-based SLAM
+[Graph-SLAM](./slam/tutorial-on-graph-slam.md)
 + model slam problem
 + graph slam 
 + optimization on manifold
-`VIO-Benchmark`:
+#### `VIO-Benchmark`: Compare Vio
 
 [benmark-mono-vio](./vio/benmark-mono-vio.md)
 
