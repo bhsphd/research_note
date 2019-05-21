@@ -121,3 +121,4 @@ $$
 $$
 \mathbf{t}=\overline{\mathbf{q}}-R \overline{\mathbf{p}}
 $$
+PS: 可以通过迭代计算，来不断优化$R,t$的值。
