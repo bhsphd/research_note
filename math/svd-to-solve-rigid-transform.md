@@ -121,4 +121,9 @@ $$
 $$
 \mathbf{t}=\overline{\mathbf{q}}-R \overline{\mathbf{p}}
 $$
-PS: 可以通过迭代计算，来不断优化$R,t$的值。
+
+
+#### Eigen代码实现
+
+[SimpleExample](https://github.com/JiaoYanMoGu/cook_code/tree/master/slam/svd-rigid-transform)
+
