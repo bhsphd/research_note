@@ -73,7 +73,8 @@ $$
 $$
 \mathbf{H} \Delta \mathbf{x}^{*}=-\mathbf{b}
 $$
-
 $$
 \mathbf{x}^{*}=\breve{\mathbf{x}}+\Delta \mathbf{x}^{*}
 $$
+
+$\mathbf{H}$中不为0的参数块个数为(约束个数+节点个数)的两倍。可以通过稀疏$Cholesky$分解来完成求解。
