@@ -1,8 +1,8 @@
-### 特征点提取与匹配
+## 特征点提取与匹配
 
-#### 特征点介绍
+### 特征点介绍
 
-##### Harris角点检测
+#### Harris角点检测
 
 特征点具有局部差异性，定义：
 $$
@@ -28,7 +28,7 @@ $S V D(\boldsymbol{H})=\boldsymbol{U} \sum \boldsymbol{V}, \quad\left(\lambda_{1
 
 `判定准则`
 $$
-C  =det(H)-ktrace(H)^2 = \lambda _1 \lambda _2 - k(\lambda _1+\lambda _2 )^2,k=0.04 
+C  =det(H)-ktrace(H)^2 = \lambda _1 \lambda _2 - k(\lambda _1+\lambda _2 )^2,k=0.04
 $$
 
 + k的值越小，越敏感
@@ -54,3 +54,51 @@ $$
 C=\operatorname{det}(H)-k \operatorname{trace}(H)^{2}=\lambda_{1} \lambda_{2}-k\left(\lambda_{1}+\lambda_{2}\right)^{2}
 $$
 找到$Harris$角点响应值大于给定阈值且局部最大的位置作为特征点。
+
+#### LoG 特征
+
+> Harris角点检测不具有尺度不变性
+> 通过尺度归一化LoG算子解决
+
+LoG算子(Laplacian of Gaussian)函数的极值点对应着特征点。
+
+##### LoG算子
+
+`尺度空间`:
+$$
+L\left(x, y, \sigma_{D}\right)=I(x, y) * G\left(x, y, \sigma_{D}\right), \quad \sigma_{D} \in\left\{\sigma_{0}, \quad k \sigma_{0}, \quad k^{2} \sigma_{0}, \quad \ldots\right\}
+$$
+`LoG算子`:
+$$
+\nabla^{2} \mathrm{L}\left(x, y, \sigma_{\mathrm{D}}\right) =
+\left(\frac{\partial^{2} \mathrm{L}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial x^{2}}+\frac{\partial^{2} \mathrm{L}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial y^{2}}\right)\\=\left(\frac{\partial^{2} \mathrm{G}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial x^{2}}+\frac{\partial^{2} \mathrm{G}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial y^{2}}\right) * I(x,y)
+$$
+`尺度归一化LoG算子`:
+$$
+\nabla_{\mathrm{norm}}^{2} \mathrm{L}\left(x, y, \sigma_{\mathrm{D}}\right)= \sigma_{\mathrm{D}}^{2}\left(\frac{\partial^{2} \mathrm{G}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial x^{2}}+\frac{\partial^{2} \mathrm{G}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial y^{2}}\right)* I(x,y)
+$$
+
++ 不同尺度下LoG响应值不具有可比性
++ 构建尺度空间，同时在位置空间和尺度空间寻找归一化LoG极值(极大/极小)点作为特征点
+
+`流程如下`:
+
+step1: 计算不同尺度上的尺度归一化LoG函数值
+$$
+\nabla_{\mathrm{nomm}}^{2} \mathrm{L}\left(x, y, \sigma_{\mathrm{D}}\right)=\sigma_{\mathrm{D}}^{2}\left(\frac{\partial^{2} \mathrm{G}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial x^{2}}+\frac{\partial^{2} \mathrm{G}\left(x, y, \sigma_{\mathrm{D}}\right)}{\partial y^{2}}\right) * I(x, y)
+$$
+step2: 同时在位置和尺度构成的三维空间寻找尺度归一化LoG的极值点
+step3: 进行非极大值抑制，减少重复检测
+
+#### 基于DoG的特征检测子(Sift)
+
+Lowe(2004)提出LoG可以近似等价于相邻尺度的高斯差分(DoG)
+
+`高斯空间`:
+$$
+L(x, y, \sigma)=G(x, y, \sigma) * I(x, y)
+$$
+`高斯差分(DoG)`:
+$$
+\begin{aligned} D(x, y ; \sigma) &=(G(x, y ; k \sigma)-G(x, y ; \sigma)) * I(x, y) \\ &=L(x, y ; k \sigma)-L(x, y ; \sigma) \end{aligned}
+$$
