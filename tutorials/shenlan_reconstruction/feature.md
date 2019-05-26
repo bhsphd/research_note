@@ -102,3 +102,26 @@ $$
 $$
 \begin{aligned} D(x, y ; \sigma) &=(G(x, y ; k \sigma)-G(x, y ; \sigma)) * I(x, y) \\ &=L(x, y ; k \sigma)-L(x, y ; \sigma) \end{aligned}
 $$
+
+##### 尺度空间的构建
+
+`高斯空间`: $2^{o-1}\left(\sigma, k \sigma, \cdots, k^{S+2} \sigma\right), k=2^{\frac{1}{S}}$
+
+`高斯差分`: $2^{o-1}\left(\sigma, k \sigma, \cdots, k^{S+1} \sigma\right), k=2^{\frac{1}{S}}$ 
+
+`有效差分`: $2^{o-1}\left(k \sigma, \cdots, k^{S} \sigma\right), k=2^{\frac{1}{S}}$ 
+
+ 参数含义：
+
++ $O$ : 阶数
++ $S$: 每阶有效差分数
++ $N=S+3$: 每阶层数
+
+示意图如下：
+
+![](./figs/sift_octave1.png)
+
+![](./figs/sift_octave2.png)
+
+![](./figs/sift_octave3.png)
+
