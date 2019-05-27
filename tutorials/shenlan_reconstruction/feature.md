@@ -125,3 +125,179 @@ $$
 
 ![](./figs/sift_octave3.png)
 
+简单例子:
+
+![](./figs/scale_space.png)
+
+
+
+##### 特征点位置的确定
+
+在位置和尺度空间组成的三维空间中寻找极值点。
+
+亚像素特征点位置的确定：
+$$
+\begin{array}{l}{\boldsymbol{x}=[x, y, \sigma]^{T}} \\ {\boldsymbol{x}_{0}=\left[x_{0}, y_{0}, \sigma_{0}\right]^{T}}\end{array}
+$$
+ DoG值:
+$$
+f(\boldsymbol{x}) = f(\boldsymbol{x_0}) \nabla f\left(\boldsymbol{x}_{0}\right)^{T}\left(\boldsymbol{x}-\boldsymbol{x}_{0}\right) +\frac{1}{2} (\boldsymbol{x-x_0})^T \nabla^2 f(\boldsymbol{x_0})(\boldsymbol{x-x_0})
+$$
+利用泰勒展开，令$\delta \boldsymbol{x=x-x_0}  $
+$$
+f(\delta \boldsymbol{x})=\nabla f\left(\boldsymbol{x}_{0}\right)^{T} \delta \boldsymbol{x}+\frac{1}{2} \delta \boldsymbol{x}^{T} \nabla^{2} f\left(\boldsymbol{x}_{0}\right) \delta \boldsymbol{x} \\
+\frac{\partial f(\delta \boldsymbol{x})}{\partial \delta \boldsymbol{x}}=\nabla f^{T}\left(\boldsymbol{x}_{0}\right)+\nabla^{2} f\left(\boldsymbol{x}_{0}\right) \delta \boldsymbol{x}=\boldsymbol{0} \\
+\delta \boldsymbol{x}=-\nabla^{2} f\left(\boldsymbol{x}_{0}\right)^{-1} \nabla f^{T}\left(\boldsymbol{x}_{0}\right) \Rightarrow  f(\boldsymbol{x})=f\left(\boldsymbol{x}_{0}\right)+\frac{1}{2} \nabla f\left(\boldsymbol{x}_{0}\right)^{T}\left(\boldsymbol{x-x_{0}}\right)
+$$
+取$\vert f(\boldsymbol{x}) \vert \ge 0.04$的坐标点作为特征点位置。
+
+$\nabla f(\boldsymbol{x_0})$的表达式：
+$$
+\begin{aligned} \nabla f&=\left[\frac{\partial f}{\partial x},\right. \frac{\partial f}{\partial y}, \frac{\partial f}{\partial z} ] \\
+\frac{\partial f}{\partial x}&=\frac{f(x+1, y, \sigma)-f(x-1, y, \sigma)}{2 h_{x}} \\
+\frac{\partial f}{\partial y} &=\frac{f(x, y+1, \sigma)-f(x, y-1, \sigma)}{2 h_{y}} \\ 
+\frac{\partial f}{\partial \sigma} &=\frac{f(x, y, \sigma+1)-f(x, y, \sigma-1)}{2 h_{\sigma}} \end{aligned}
+$$
+$\nabla^2f(\boldsymbol{x_0})$的表达式：
+$$
+\nabla^{2} f=\left[ \begin{array}{ccc}{\frac{\partial^{2} f}{\partial x^{2}}} & {\frac{\partial^{2} f}{\partial x \partial y}} & {\frac{\partial^{2} f}{\partial x \partial \sigma}} \\ {\frac{\partial^{2} f}{\partial x \partial y}} & {\frac{\partial^{2} f}{\partial y^{2}}} & {\frac{\partial^{2} f}{\partial y \partial \sigma}} \\ {\frac{\partial^{2} f}{\partial x \partial \sigma}} & {\frac{\partial^{2} f}{\partial y \partial \sigma}} & {\frac{\partial^{2} f}{\partial \sigma^{2}}}\end{array}\right]  \\
+\begin{aligned} \frac{\partial^{2} f}{\partial x^{2}} &=\frac{f(x+1, y, \sigma)+f(x-1, y, \sigma)-2 f(x, y, \sigma)}{d^{2} x} \\ \frac{\partial^{2} f}{\partial y^{2}} &=\frac{f(x, y+1, \sigma)+f(x, y-1, \sigma)-2 f(x, y, \sigma)}{d^{2} y} \\ \frac{\partial^{2} f}{\partial \sigma^{2}} &=\frac{f(x, y, \sigma+1)+f(x, y, \sigma-1)-2 f(x, y, \sigma)}{d^{2} \sigma} \end{aligned} \\ 
+\frac{\partial^{2} f}{\partial x \partial y}=\frac{[f(x+1, y+1, \sigma)+f(x-1, y-1, \sigma)]-[f(x+1, y-1, \sigma)+f(x+1, y-1, \sigma)]}{4 d x d y} \\
+\frac{\partial^{2} f}{\partial x \partial \sigma}=\frac{[f(x-1, y, \sigma-1)+f(x+1, y, \sigma+1)]-[f(x+1, y, \sigma-1)+f(x-1, y, \sigma+1)]}{4 d x d \sigma} \\
+\frac{\partial^{2} f}{\partial y \partial \sigma}=\frac{[f(x, y-1, \sigma-1)+f(x, y+1, \sigma+1)]-[f(x, y+1, \sigma-1)+f(x, y-1, \sigma+1)]}{4 d y d \sigma} 
+$$
+`边缘点的去除`：
+$$
+\frac{\operatorname{trace}(\mathbf{H})^{2}}{\operatorname{Det}(\mathbf{H})}<\frac{(r+1)^{2}}{r}, r=10
+$$
+通过统计梯度直方图的方法确定主方向，使算法具有旋转不变性：
+
+![](./figs/sift_rotation.png)
+
+##### 整体流程如下
+
+`计算图像尺度空间`
+$$
+2^{o-1}\left(\sigma, k \sigma, \cdots, k^{S+2} \sigma\right), k=2^{\frac{1}{S}}\\
+2^{o-1} \left(\sigma, k \sigma, \cdots, k^{S+1} \sigma\right), k=2^{\frac{1}{S}}\\
+2^{o-1}\left(k \sigma, \cdots, k^{S} \sigma\right), k=2^{\frac{1}{S}}
+$$
+`DoG极值点检测与定位`
+$$
+\begin{array}{l}{\delta \boldsymbol{x}=-\nabla^{2} f\left(\boldsymbol{x}_{0}\right)^{-1} \nabla f^{T}\left(\boldsymbol{x}_{0}\right)} \\ {f(\boldsymbol{x})=f\left(\boldsymbol{x}_{0}\right)+\frac{1}{2} \nabla f\left(\boldsymbol{x}_{0}\right)^{T}(\boldsymbol{x}-\boldsymbol{x} 0)}\end{array} 
+$$
+保留$\vert f(\boldsymbol{x}) \ge 0.04 \vert $的特征点。
+
+`边缘点去除`
+$$
+\frac{\operatorname{trace}(\mathbf{H})^{2}}{\operatorname{Det}(\mathbf{H})}<\frac{(r+1)^{2}}{r}, r=10
+$$
+`计算主方向`
+
+`生成描述子`
+
+#### Fast(Feature from Accelerated Segment Test)特征检测
+
+通过检测局部像素灰度变换来确认特征点的位置
+
+[Ref](Fusing points and lines for high performance tracking)
+
+![](./figs/fast_feature.png)
+
+#### Oriented FAST(ORB)
+
+`获取尺度不变性`：构建图像金字塔，在金字塔每一层上检测关键
+
+`获取旋转不变性`： 通过灰度质心法(Intensity Centroid)确定主方向
+
+图像块B上的矩定义为：$C_{m n}=\sum_{x, y \in \mathrm{B}} x^{m} y^{n} I(x, y), m, n=\{0,1\}$
+
+图像块B的质心定义为：$O^{\prime}=\left(\frac{C_{10}}{C_{00}}, \frac{C_{01}}{C_{00}}\right)$
+
+方向角：$\theta=\arctan \left(\frac{C_{01}}{C_{10}}\right)$
+
+### 特征描述子
+
+基本分类如下：
+
++ 基于直方图的描述子
++ 基于不变性的描述子
++ 二进制描述子
+
+基本参数:$(x,y,\theta,\sigma)$
+
+#### 基于直方图的描述子
+
+`用于微小运动的描述子`：
+
+以特征点为中心矩形区域内所有像素的灰度值作为描述子
+$$
+E_{S S D}=\sum_{i=1}^{N} \sum_{j=1}^{N}\left\|I_{1}(x, y)-I_{2}(x, y)\right\|^{2}
+$$
+`Sift描述子`:
+
+旋转：
+
+根据主方向对支持区域($\sigma$)进行旋转，通过双线性插值重构:
+$$
+I' = \frac{I-u}{s}
+$$
+图像归一化处理，去除光照变换。
+
+统计局部梯度信息：
+
+将区域划分成$4\times 4$的Block，每个Block内统计梯度方向的直方图(高斯加权梯度作为系数)。
+
+![](./figs/sift_descriptor.png)
+
+生成描述子：
+
+![](./figs/sift_descriptor2.png)
+
+归一化处理：
+
++ 门限处理：直方图每个方向的梯度幅值不超过0.2
++ 描述子长度归一化
+
+归一化处理提升了特征点的光照不变性。
+
+#### 二进制描述子(BRIEF)
+
+特征向量由N个0或者1组成，N=128,256,512
+
+![](./figs/brief_descriptor.png)
+
+生成速度快，匹配效率高，具有旋转不变性。
+
+#### Steer Brief
+
+N对采样点$S=\left( \begin{array}{lll}{x_{1}} & {\dots} & {x_{n}} \\ {y_{1}} & {\dots} & {y_{n}}\end{array}\right)$,根据主方向计算旋转$S_{\theta}=R_{\theta} S$在新的采样点上进行BRIEF描述子生成。
+
+### 特征点匹配
+
+#### 问题描述
+
+![](./figs/match_01.png)
+
+#### 距离度量参数
+
++ 欧氏距离：$D_{e u c}(\boldsymbol{a}, \boldsymbol{b})=\|\boldsymbol{a}-\boldsymbol{b}\|_{2}=\left(\sum_{i=1}^{n}\left(a_{i}-b_{i}\right)^{2}\right)^{\frac{1}{2}}$ $D_{s s d}(\boldsymbol{a}, \boldsymbol{b})=\|\boldsymbol{a}-\boldsymbol{b}\|_{2}^{2}=D_{e u c}(\boldsymbol{a}, \boldsymbol{b})^{2}$
++ 马氏距离：$D_{\text {mahal}}(\boldsymbol{a}, \boldsymbol{b})=\left((\boldsymbol{a}-\boldsymbol{b})^{T} \sum^{-1}(\boldsymbol{a}-\boldsymbol{b})\right)^{\frac{1}{2}}$
++ 归一化互相关：$N C C(\boldsymbol{a}, \boldsymbol{b})=\sum_{i=1}^{n} \frac{1}{s_{a} s_{b}}\left(a_{i}-u_{a}\right)\left(b_{i}-u_{b}\right)$
++ 汉明距离：$D_{h a m}(\boldsymbol{a}, \boldsymbol{b})=\sum_{i=1}^{n} a_{i} \oplus b_{i}$
+
+#### 匹配策略
+
+最近邻搜索：$b^{*}=\arg \min _{b \in \mathrm{B}} D(\boldsymbol{a}, \boldsymbol{b}), D\left(a, b^{*}\right)<\beta$
+
+最近邻距离比(Lowe-Ratio)：$\frac{D\left(a, b^{*}\right)}{D\left(a, b^{* *}\right)}<\alpha$
+
+最近邻距离与次近邻距离比小于一定值。
+
+![](./figs/lowe_ratio.png)
+
+#### 高效匹配
+
++ Hash表
++ KD-Tree
++ 特征匹配利用Homography/Fundamental进行去除
