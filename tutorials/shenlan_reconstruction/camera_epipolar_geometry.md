@@ -175,3 +175,43 @@ $$
 
 #### 单应矩阵H
 
+##### Homography几何推导
+
+空间中特征点位于一个平面上，故点坐标满足:
+$$
+\boldsymbol{n}^T\boldsymbol{X}+d = 0 \Rightarrow  - \frac{\boldsymbol{n}^T\boldsymbol{X}}{d} = 1
+$$
+利用两个相机之间的坐标变换可以得到：
+$$
+\begin{aligned} \boldsymbol{x}_{2} &=\boldsymbol{K}_{2}(\boldsymbol{R} \boldsymbol{X}+\boldsymbol{t}) \\ &=\boldsymbol{K}_{2}\left(\boldsymbol{R} \boldsymbol{X}+\boldsymbol{t} \cdot\left(-\frac{\boldsymbol{n}^{T} \boldsymbol{X}}{d}\right)\right) \\ &=\boldsymbol{K}_{2}\left(\boldsymbol{R}-\frac{t \boldsymbol{n}^{T}}{d}\right) \boldsymbol{X} \\ &=\boldsymbol{K}_{2}\left(\boldsymbol{R}-\frac{t \boldsymbol{n}^{T}}{d}\right) \boldsymbol{K}_{1}^{-1} \boldsymbol{x}_{1} \end{aligned}
+$$
+于是可以得到：
+$$
+\boldsymbol{x}_{2}=\boldsymbol{H x}_{1}, \quad \boldsymbol{H}=\boldsymbol{K}_{2}\left(\boldsymbol{R}-\frac{\boldsymbol{t} \boldsymbol{n}^{T}}{d}\right) \boldsymbol{K}_{1}^{-1}
+$$
+
+##### 性质
+
++ 单应矩阵是满秩的: $\boldsymbol{x}_{1}=\boldsymbol{H}^{-1} \boldsymbol{x}_{2}$ 
++ $\boldsymbol{t=0}$时，对应纯旋转: $\boldsymbol{H}=\boldsymbol{K}_{2} \boldsymbol{R} K_{1}^{-1}$
++ 单应矩阵适用的条件：空间点共面或相机纯旋转($d\gg \vert \boldsymbol{t}\vert $)
+
+##### 求解方法
+
+![](./figs/homography_dlt.png)
+
+`RANSAC - 估计单应矩阵`:
+
+算法流程：
+
+1. 随机采样4对匹配点$(x_1^{(n)},x_2^{(n)})$ 
+2. DLT求解矩阵$\boldsymbol{H}$
+3. 计算误差，并统计内点个数
+4. 重复上述过程，并选择内点最多的结果
+5. 对所有内点执行3,4，重新计算$\boldsymbol{H}$
+
+
+
+#### CodeTrick:
+
+各个矩阵的计算基本都需要对点坐标进行预处理，未完待续.
