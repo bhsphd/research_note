@@ -1,5 +1,10 @@
 ## 论文阅读记录
 ### Structure from Motion
+#### Rotation Avaraging 
+[RotationAveraging](./sfm/RotationAveraging.md)
++ Rotation Averaging
++ Global SfM
++ L1 optimization
 #### Bundle Adjustment in the Large 
 [Bundle Adjustment in the Large ](./sfm/bal.md)
 #### Batched Incremental Structure-from-Motion 
