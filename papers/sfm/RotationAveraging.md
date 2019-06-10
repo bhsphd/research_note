@@ -76,7 +76,7 @@ $$
   2. $\Delta \boldsymbol{\omega}_{i j}=\log \left(\Delta \mathbf{R}_{i j}\right)$
   3. 求解$\mathbf{A} \Delta \boldsymbol{\omega}_{g l o b a l}=\Delta \boldsymbol{\omega}_{r e l}$
   4. $\forall k \in[1, N], \mathbf{R}_{k}=\mathbf{R}_{k} \exp \left(\Delta \boldsymbol{\omega}_{k}\right)$
-  5. 循环迭代
+  5. 循环迭代，直到$\Vert\Delta \boldsymbol{\omega}_{i j} \Vert < \epsilon$为止。
 
 
 
@@ -113,6 +113,7 @@ $l_1$范数优化提供了较好地应对outliers的措施，利用$l_2$范数�
   2. $\mathbf{e} \leftarrow \mathbf{A} \mathbf{x}-\mathbf{b}$
   3. $\Phi \leftarrow \Phi(\mathrm{e})$
   4. $\mathbf{x} \leftarrow\left(\mathbf{A}^{T} \mathbf{\Phi} \mathbf{A}\right)^{-1} \mathbf{A} \mathbf{\Phi} \mathbf{b}$
+  5. 循环迭代，直到$\Vert\Delta \boldsymbol{\omega}_{i j} \Vert < \epsilon$为止。
 
 利用鲁棒cost function:
 $$

@@ -35,3 +35,6 @@
 + [各种变换以及数学知识](http://www.euclideanspace.com/) `四元数变换` `旋转矩阵`
 + [Python环境图解](https://xkcd.com/) 
 + [Minimal Problems](http://cmp.felk.cvut.cz/mini/) `PnP` `三角化` `P3P`
+
+#### LaTeX速查笔记
+[LaTeX速查](./latex.md)
