@@ -3,7 +3,7 @@
 + [g2o](./slam/g2o.md): `g2o: A General Framework for Graph Optimization`
 + [graph-slam](./slam/tutorial-on-graph-slam.md): `Graph SLAM: A Tutorial on Graph-based SLAM`
 + [vio-benchmark](./vio/benmark-mono-vio.md): `A Benchmark Comparison of Monocular Visual-Inertial Odometry Algorithms for Flying Robots`
-+ drone-race-dataset: `Are We Ready for Autonomous Drone Racing? The UZH-FPV Drone Racing Dataset`
++ [drone-race-dataset](./paper_factory/rpg_vio_dataset.md): `Are We Ready for Autonomous Drone Racing? The UZH-FPV Drone Racing Dataset`
 
 #### Structure from Motion
 
