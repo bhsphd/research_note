@@ -83,7 +83,7 @@ $$
 $$
 图示：
 
-![](../../resources/paper_figure/inverse_depth_paper.png)
+![](./figures/inverse_depth_paper.png)
 
 
 

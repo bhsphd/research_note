@@ -27,7 +27,7 @@ $$
 
 $x_i,x_j$为对应图中的`Feature`点。
 
-![](../../resources/paper_figure/view_graph_opt_fig1.png)
+![](./figures/view_graph_opt_fig1.png)
 $$
 C(x)_i^{jk} = \Vert x_i -\hat{x}_i^{jk} \Vert_2 \\
 $$

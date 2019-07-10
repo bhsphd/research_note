@@ -8,7 +8,7 @@
 
 对极几何描述了同一场景的两幅图像之间的视觉几何关系,设两个相机的中心分别为 $O_r$,$O_l$,两图像的平面分别为$I$和$I^{'}$,设$P$为共同视域中的空间点,它再两幅图像平面上的像素点坐标分别为$p_l$,$p_r$,对极几何主要包括如下几个几何元素:
 
-![](../resources/mvg_epipolar1.png)
+![](./figures/mvg_epipolar1.png)
 
 
 
@@ -22,19 +22,19 @@
 
 如果有两个相机,`cam1`在建筑物的左侧,`cam2`在建筑物的右侧,拍摄得到两张照片.像平面是无限延伸的,照片只是像平面的一部分.
 
-![](../resources/mvg_epipolar_cam1.png)
+![](./figures/mvg_epipolar_cam1.png)
 
 
 
 对应的极线为:
 
-![](../resources/mvg_epipolar_cam2.png)
+![](./figures/mvg_epipolar_cam2.png)
 
 ### 公式推导
 
 两个相机坐标系的关系如下图所示:
 
-![](../resources/mvg_epipolar_T.png)
+![](./figures/mvg_epipolar_T.png)
 
 $P_l$是点$P$在$O_l$坐标系下的坐标,$P_r$是点$P$在$O_r$坐标系下的坐标,坐标系$O_r$到坐标系$O_l$的变换对应为$R$和$T$,即
 $$
